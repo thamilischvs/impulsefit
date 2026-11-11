@@ -1,4 +1,10 @@
-# 🏋️‍♂️ IronPulse Gym — Sistema de Gestão de Academia
+# 🏋️‍♂️ IronPulse Gym (ImpulseFit) — Sistema de Gestão de Academia
+
+## 🌐 Acesso Online (GitHub Pages)
+- **Aplicação Web (GitHub Pages):** [https://thamilischvs.github.io/impulsefit/](https://thamilischvs.github.io/impulsefit/)
+- **Repositório Oficial:** [https://github.com/thamilischvs/impulsefit](https://github.com/thamilischvs/impulsefit)
+
+---
 
 ## 📌 Visão Geral
 O **IronPulse Gym** é um sistema Web responsivo para gestão administrativa e recepção de academias, desenvolvido com **HTML5, CSS3, JavaScript Vanilla (ES6+), Tailwind CSS e Supabase**.
@@ -30,33 +36,21 @@ O script completo encontra-se em [`sql/schema.sql`](./sql/schema.sql) e contempl
 ## 📂 Estrutura Modular de Arquivos
 
 ```text
-crud/
-├── index.html                  # Autenticação: Login e Cadastro Administrativo (Recepção)
+impulsefit/
+├── index.html                  # Autenticação exclusiva de Operadores/Admin (Supabase Auth)
 ├── dashboard.html              # Layout Principal: Dashboard, Alunos, Planos, Treinos e Matrículas
 ├── README.md                   # Documentação do projeto
 ├── sql/
-│   └── schema.sql              # Script SQL das 4 tabelas, FKs e políticas RLS
+│   └── schema.sql              # Script SQL das 4 tabelas, FKs, GRANTs e políticas RLS
 └── assets/
     ├── css/
     │   └── styles.css          # Estilos customizados, Glassmorphism e Background Fixo (Planos)
     └── js/
         ├── supabaseConfig.js   # Inicialização do cliente Supabase, Auth Guard e helpers globais
-        ├── auth.js             # Login, Cadastro (Recepção), validação de e-mail e Logout
+        ├── auth.js             # Login Administrativo, validação de e-mail e Logout
         ├── dashboard.js        # Orquestração de abas e cálculo dos 3 Cards de Resumo (KPIs)
         ├── alunos.js           # CRUD 1: Gestão completa da tabela `alunos`
         ├── planos.js           # CRUD 2: Gestão da tabela `planos` em Grid de 3 Cards com bg-fixed
         ├── treinos.js          # CRUD 3: Gestão da tabela `treinos` e vínculo com aluno específico
         └── matriculas.js       # Relacional: Vínculo entre `alunos` e `planos` na tabela `matriculas`
 ```
-
----
-
-## ⚙️ Como Configurar e Executar
-
-1. **Criar as Tabelas no Supabase:**
-   - No painel do seu projeto em [supabase.com](https://supabase.com/), abra o **SQL Editor**, cole o conteúdo de [`sql/schema.sql`](./sql/schema.sql) e clique em **Run**.
-2. **Inserir as Credenciais (`anon` / `public`):**
-   - Copie a **Project URL** e a chave **`anon` `public`** em **Project Settings > API**.
-   - Substitua `SUPABASE_URL` e `SUPABASE_ANON_KEY` em [`assets/js/supabaseConfig.js`](./assets/js/supabaseConfig.js).
-3. **Executar a Aplicação:**
-   - Abra [`index.html`](./index.html) utilizando o **Live Server** (VS Code) ou qualquer servidor HTTP local.
