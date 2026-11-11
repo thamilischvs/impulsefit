@@ -1,4 +1,4 @@
-# 🏋️‍♂️ IronPulse Gym (ImpulseFit) — Sistema de Gestão de Academia
+# 🏋️‍♂️ ImpulseFit — Sistema de Gestão de Academia
 
 ## 🌐 Acesso Online (GitHub Pages)
 - **Aplicação Web (GitHub Pages):** [https://thamilischvs.github.io/impulsefit/](https://thamilischvs.github.io/impulsefit/)
@@ -7,7 +7,7 @@
 ---
 
 ## 📌 Visão Geral
-O **IronPulse Gym** é um sistema Web responsivo para gestão administrativa e recepção de academias, desenvolvido com **HTML5, CSS3, JavaScript Vanilla (ES6+), Tailwind CSS e Supabase**.
+O **ImpulseFit** é um sistema Web responsivo para gestão administrativa e recepção de academias, desenvolvido com **HTML5, CSS3, JavaScript Vanilla (ES6+), Tailwind CSS e Supabase**.
 
 O sistema permite gerenciar o ciclo completo de **Alunos**, **Planos**, **Treinos** (com associação a alunos específicos) e **Matrículas Relacionais**, calculando indicadores financeiros e operacionais em tempo real no **Dashboard**.
 

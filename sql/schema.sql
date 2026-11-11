@@ -1,5 +1,5 @@
 -- ============================================================================
--- SISTEMA DE GESTÃO DE ACADEMIA (IRONPULSE GYM)
+-- SISTEMA DE GESTÃO DE ACADEMIA (IMPULSEFIT)
 -- Script SQL Completo: Recriação Limpa de Tabelas, Permissões GRANT e RLS
 -- ============================================================================
 
