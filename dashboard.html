@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Administrativo | IronPulse Gym</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- SweetAlert2 via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Lucide Icons via CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Supabase JS v2 via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- CSS Customizado -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="min-h-screen bg-gym-mesh bg-grid-pattern text-slate-100 flex flex-col lg:flex-row selection:bg-emerald-500 selection:text-white">
+
+  <!-- Barra de Navegação Superior (Mobile) -->
+  <header class="lg:hidden flex items-center justify-between px-4 py-3.5 glass-panel sticky top-0 z-30 border-b border-white/[0.08]">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-slate-950 shadow-md shadow-emerald-500/20">
+        <i data-lucide="dumbbell" class="w-5 h-5 stroke-[2.5]"></i>
+      </div>
+      <span class="font-display font-extrabold text-white tracking-tight">IRON<span class="text-emerald-400">PULSE</span></span>
+    </div>
+    <button
+      type="button"
+      id="btnMobileMenu"
+      class="p-2 rounded-xl bg-white/[0.05] text-slate-200 hover:bg-white/[0.1]"
+      aria-label="Abrir Menu"
+    >
+      <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
+  </header>
+
+  <!-- Sidebar de Navegação Lateral (Desktop + Gaveta Mobile) -->
+  <aside
+    id="sidebarMenu"
+    class="hidden lg:flex lg:flex-col lg:w-72 glass-panel border-b lg:border-b-0 lg:border-r border-white/[0.08] shrink-0 justify-between z-20 lg:sticky lg:top-0 lg:h-screen"
+  >
+    <div class="p-6">
+      <!-- Logo Desktop -->
+      <div class="hidden lg:flex items-center gap-3.5 pb-6 mb-6 border-b border-white/[0.08]">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/25">
+          <i data-lucide="dumbbell" class="w-6 h-6 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <h1 class="font-display font-extrabold text-lg text-white tracking-tight leading-none">
+            IRON<span class="text-emerald-400">PULSE</span>
+          </h1>
+          <span class="text-[11px] font-medium text-slate-400">Sistema de Gestão</span>
+        </div>
+      </div>
+
+      <p class="px-3 mb-2.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+        Menu Principal
+      </p>
+
+      <!-- Menus do Sistema -->
+      <nav class="space-y-1.5" aria-label="Navegação Principal">
+        <button
+          type="button"
+          data-tab="dashboard"
+          class="nav-tab-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-950/50 transition-all"
+        >
+          <span class="flex items-center gap-3">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          data-tab="alunos"
+          class="nav-tab-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all"
+        >
+          <span class="flex items-center gap-3">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Alunos</span>
+          </span>
+          <span id="badgeCountAlunos" class="font-mono-num text-xs px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-300">0</span>
+        </button>
+
+        <button
+          type="button"
+          data-tab="planos"
+          class="nav-tab-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all"
+        >
+          <span class="flex items-center gap-3">
+            <i data-lucide="credit-card" class="w-4 h-4"></i>
+            <span>Planos</span>
+          </span>
+          <span id="badgeCountPlanos" class="font-mono-num text-xs px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-300">0</span>
+        </button>
+
+        <button
+          type="button"
+          data-tab="treinos"
+          class="nav-tab-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all"
+        >
+          <span class="flex items-center gap-3">
+            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+            <span>Treinos</span>
+          </span>
+          <span id="badgeCountTreinos" class="font-mono-num text-xs px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-300">0</span>
+        </button>
+
+        <button
+          type="button"
+          data-tab="matriculas"
+          class="nav-tab-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all"
+        >
+          <span class="flex items-center gap-3">
+            <i data-lucide="file-Spreadsheet" class="w-4 h-4"></i>
+            <span>Matrículas</span>
+          </span>
+          <span id="badgeCountMatriculas" class="font-mono-num text-xs px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-300">0</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Rodapé da Sidebar: Usuário Autenticado e Botão de Logout -->
+    <div class="p-5 border-t border-white/[0.08] bg-slate-950/60">
+      <div class="flex items-center gap-3 mb-4 px-1">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xs shrink-0">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+        </div>
+        <div class="overflow-hidden">
+          <p id="userEmailDisplay" class="text-xs font-semibold text-white truncate">Recepção Admin</p>
+          <p id="userRoleDisplay" class="text-[11px] text-emerald-400 truncate">Sessão Ativa (Supabase)</p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onclick="handleLogout()"
+        class="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 text-rose-400 text-xs font-semibold transition"
+      >
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        <span>Sair (Logout)</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Conteúdo Principal -->
+  <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+    <div class="max-w-7xl mx-auto space-y-6 animate-fade-up">
+
+      <!-- ================================================================== -->
+      <!-- 3 CARDS DE RESUMO DO DASHBOARD (SEMPRE ATUALIZADOS EM TEMPO REAL)  -->
+      <!-- ================================================================== -->
+      <section aria-label="Cards de Resumo" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Card 1: Total de Alunos Cadastrados -->
+        <div class="p-6 rounded-2xl glass-card flex items-start justify-between">
+          <div>
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total de Alunos Cadastrados</span>
+            <p id="kpiTotalAlunos" class="font-mono-num text-3xl sm:text-4xl font-extrabold text-white mt-2">0</p>
+            <p id="kpiSubTotalAlunos" class="text-xs text-emerald-400 mt-1.5 font-medium">0 aluno(s) ativo(s)</p>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/25 text-emerald-400">
+            <i data-lucide="users" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <!-- Card 2: Receita Estimada (Soma dos Planos das Matrículas Ativas) -->
+        <div class="p-6 rounded-2xl glass-card flex items-start justify-between">
+          <div>
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Receita Estimada</span>
+            <p id="kpiReceitaEstimada" class="font-mono-num text-3xl sm:text-4xl font-extrabold text-white mt-2">R$ 0,00</p>
+            <p id="kpiSubReceita" class="text-xs text-teal-400 mt-1.5 font-medium">Soma dos planos das matrículas ativas</p>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-teal-500/15 border border-teal-500/25 text-teal-400">
+            <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <!-- Card 3: Total de Alunos Inativos -->
+        <div class="p-6 rounded-2xl glass-card flex items-start justify-between">
+          <div>
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total de Alunos Inativos</span>
+            <p id="kpiAlunosInativos" class="font-mono-num text-3xl sm:text-4xl font-extrabold text-white mt-2">0</p>
+            <p class="text-xs text-rose-400 mt-1.5 font-medium">Cadastros com status inativo</p>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/25 text-rose-400">
+            <i data-lucide="user-x" class="w-6 h-6"></i>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- B. SEÇÃO DASHBOARD (PÁGINA INICIAL)                                -->
+      <!-- ================================================================== -->
+      <section id="view-dashboard" class="tab-view space-y-6">
+        <!-- Barra de Ações Rápidas -->
+        <div class="glass-card p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-display text-xl font-bold text-white">Visão Geral da Academia</h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
+              Acompanhe os indicadores em tempo real e acesse rapidamente os cadastros e matrículas.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              onclick="navegarParaAba('alunos'); openAlunoModal();"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition"
+            >
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>Novo Aluno</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="navegarParaAba('planos'); openPlanoModal();"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-xs font-semibold transition"
+            >
+              <i data-lucide="credit-card" class="w-4 h-4"></i>
+              <span>Novo Plano</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="navegarParaAba('treinos'); openTreinoModal();"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-semibold transition"
+            >
+              <i data-lucide="dumbbell" class="w-4 h-4"></i>
+              <span>Novo Treino</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="navegarParaAba('matriculas');"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-bold shadow-lg shadow-emerald-500/20 transition"
+            >
+              <i data-lucide="check-square" class="w-4 h-4 stroke-[2.5]"></i>
+              <span>Realizar Matrícula</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Últimas Matrículas Registradas -->
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-white/[0.08] flex items-center justify-between">
+            <div>
+              <h3 class="font-display text-base font-bold text-white">Matrículas Recentes</h3>
+              <p class="text-xs text-slate-400">Relação de alunos vinculados aos planos da academia</p>
+            </div>
+            <button
+              type="button"
+              onclick="navegarParaAba('matriculas')"
+              class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1"
+            >
+              <span>Ver todas</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-white/[0.08] bg-slate-950/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  <th class="py-3.5 px-5">Aluno</th>
+                  <th class="py-3.5 px-4">Plano Contratado</th>
+                  <th class="py-3.5 px-4">Valor</th>
+                  <th class="py-3.5 px-4">Período de Vigência</th>
+                  <th class="py-3.5 px-4">Situação</th>
+                  <th class="py-3.5 px-5 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaDashboardMatriculasBody" class="divide-y divide-white/[0.06] text-sm">
+                <tr>
+                  <td colspan="6" class="py-10 text-center text-slate-500">Carregando matrículas...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- C. MENU ALUNOS (CRUD 1)                                            -->
+      <!-- ================================================================== -->
+      <section id="view-alunos" class="tab-view hidden space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-5 rounded-2xl">
+          <div>
+            <h2 class="font-display text-lg font-bold text-white">Gestão de Alunos</h2>
+            <p class="text-xs text-slate-400">Cadastre, consulte, edite ou exclua alunos da academia.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Campo de busca rápida -->
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input
+                type="search"
+                id="buscaAlunosInput"
+                placeholder="Buscar nome ou CPF..."
+                class="pl-9 pr-3.5 py-2 rounded-xl bg-slate-950/80 border border-white/[0.08] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <!-- Filtro de Status -->
+            <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-white/[0.07]">
+              <button type="button" data-status-filter="TODOS" class="status-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition">
+                Todos
+              </button>
+              <button type="button" data-status-filter="ativo" class="status-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">
+                Ativos
+              </button>
+              <button type="button" data-status-filter="inativo" class="status-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">
+                Inativos
+              </button>
+            </div>
+
+            <!-- Botão Create: Novo Aluno -->
+            <button
+              type="button"
+              onclick="openAlunoModal()"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-bold shadow-lg shadow-emerald-500/20 transition"
+            >
+              <i data-lucide="user-plus" class="w-4 h-4 stroke-[2.5]"></i>
+              <span>Novo Aluno</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela Dinâmica de Alunos -->
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-white/[0.08] bg-slate-950/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  <th class="py-4 px-5">Nome do Aluno</th>
+                  <th class="py-4 px-4">CPF</th>
+                  <th class="py-4 px-4">Telefone</th>
+                  <th class="py-4 px-4">Data de Nascimento</th>
+                  <th class="py-4 px-4">Status</th>
+                  <th class="py-4 px-5 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaAlunosBody" class="divide-y divide-white/[0.06] text-sm">
+                <tr>
+                  <td colspan="6" class="py-10 text-center text-slate-500">Carregando alunos...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- D. MENU PLANOS (CRUD 2 — BACKGROUND FIXO + 3 CARDS RESPONSIVOS)    -->
+      <!-- ================================================================== -->
+      <section id="view-planos" class="tab-view hidden space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl">
+          <div>
+            <h2 class="font-display text-lg font-bold text-white">Planos de Matrícula</h2>
+            <p class="text-xs text-slate-400">Modalidades exibidas em layout com background fixo e grid de 3 cards responsivos.</p>
+          </div>
+          <button
+            type="button"
+            onclick="openPlanoModal()"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-emerald-500/20 transition"
+          >
+            <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i>
+            <span>Cadastrar Novo Plano</span>
+          </button>
+        </div>
+
+        <!-- Container com Background Fixo (bg-fixed) e Grid de 3 Cards Responsivos -->
+        <div class="bg-fixed bg-planos-fixed rounded-3xl p-6 sm:p-8 border border-white/[0.1] shadow-2xl">
+          <div id="gridPlanosCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-1 md:col-span-2 lg:col-span-3 py-12 text-center text-slate-400">
+              Carregando planos...
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- E. MENU TREINOS (CRUD 3 + ASSOCIAÇÃO A ALUNO ESPECÍFICO)           -->
+      <!-- ================================================================== -->
+      <section id="view-treinos" class="tab-view hidden space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl">
+          <div>
+            <h2 class="font-display text-lg font-bold text-white">Catálogo e Prescrição de Treinos</h2>
+            <p class="text-xs text-slate-400">Cadastre novos treinos, gerencie níveis e associe treinos a alunos específicos.</p>
+          </div>
+          <button
+            type="button"
+            onclick="openTreinoModal()"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-emerald-500/20 transition"
+          >
+            <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i>
+            <span>Novo Treino</span>
+          </button>
+        </div>
+
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-white/[0.08] bg-slate-950/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  <th class="py-4 px-5">Nome do Treino</th>
+                  <th class="py-4 px-4">Descrição / Exercícios</th>
+                  <th class="py-4 px-4">Nível</th>
+                  <th class="py-4 px-4">Aluno Associado</th>
+                  <th class="py-4 px-5 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaTreinosBody" class="divide-y divide-white/[0.06] text-sm">
+                <tr>
+                  <td colspan="5" class="py-10 text-center text-slate-500">Carregando treinos...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- F. MENU MATRÍCULA (RELACIONAL: ALUNO + PLANO)                      -->
+      <!-- ================================================================== -->
+      <section id="view-matriculas" class="tab-view hidden space-y-6">
+        <!-- Formulário Relacional para Matricular um Aluno -->
+        <div class="glass-card p-6 sm:p-8 rounded-2xl">
+          <div class="flex items-center gap-3 mb-6 pb-4 border-b border-white/[0.08]">
+            <div class="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+              <i data-lucide="file-check-2" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-display text-lg font-bold text-white">Nova Matrícula de Aluno</h2>
+              <p class="text-xs text-slate-400">Selecione um aluno e um plano disponível para gravar o vínculo na tabela <code>matriculas</code>.</p>
+            </div>
+          </div>
+
+          <form id="formMatricula" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end" novalidate>
+            <div>
+              <label for="matriculaAlunoSelect" class="block text-xs font-medium text-slate-300 mb-1.5">Aluno *</label>
+              <select
+                id="matriculaAlunoSelect"
+                required
+                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+              >
+                <option value="">Selecione um aluno cadastrado...</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="matriculaPlanoSelect" class="block text-xs font-medium text-slate-300 mb-1.5">Plano Disponível *</label>
+              <select
+                id="matriculaPlanoSelect"
+                required
+                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+              >
+                <option value="">Selecione um plano disponível...</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="matriculaDataInicio" class="block text-xs font-medium text-slate-300 mb-1.5">Data de Início *</label>
+              <input
+                type="date"
+                id="matriculaDataInicio"
+                required
+                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label for="matriculaDataFim" class="block text-xs font-medium text-slate-300 mb-1.5">Data de Fim (Vigência) *</label>
+              <input
+                type="date"
+                id="matriculaDataFim"
+                required
+                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div class="md:col-span-2 lg:col-span-4 flex justify-end pt-2">
+              <button
+                type="submit"
+                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-emerald-500/20 transition"
+              >
+                <i data-lucide="save" class="w-4 h-4 stroke-[2.5]"></i>
+                <span>Confirmar e Salvar Matrícula</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Histórico de Matrículas Gravadas -->
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-white/[0.08]">
+            <h3 class="font-display text-base font-bold text-white">Matrículas Cadastradas</h3>
+            <p class="text-xs text-slate-400">Listagem relacional de alunos e planos ativos ou encerrados</p>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-white/[0.08] bg-slate-950/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  <th class="py-4 px-5">Aluno</th>
+                  <th class="py-4 px-4">Plano</th>
+                  <th class="py-4 px-4">Valor do Plano</th>
+                  <th class="py-4 px-4">Vigência (Início / Fim)</th>
+                  <th class="py-4 px-4">Status da Matrícula</th>
+                  <th class="py-4 px-5 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaMatriculasBody" class="divide-y divide-white/[0.06] text-sm">
+                <tr>
+                  <td colspan="6" class="py-10 text-center text-slate-500">Carregando matrículas...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL 1: CRIAR / EDITAR ALUNO (CRUD 1)                                 -->
+  <!-- ====================================================================== -->
+  <div id="modalAluno" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="w-full max-w-lg glass-panel rounded-3xl shadow-2xl overflow-hidden animate-fade-up">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-white/[0.08] bg-slate-950/40">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-xl bg-emerald-500/15 text-emerald-400">
+            <i data-lucide="user-check" class="w-5 h-5"></i>
+          </div>
+          <h3 id="modalAlunoTitle" class="font-display text-base font-bold text-white">Novo Aluno</h3>
+        </div>
+        <button type="button" onclick="closeModal('modalAluno')" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06]">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formAluno" class="p-6 space-y-4" novalidate>
+        <input type="hidden" id="alunoId" />
+
+        <div>
+          <label for="alunoNome" class="block text-xs font-medium text-slate-300 mb-1.5">Nome Completo *</label>
+          <input
+            type="text"
+            id="alunoNome"
+            required
+            placeholder="Ex: Mariana Costa"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="alunoCpf" class="block text-xs font-medium text-slate-300 mb-1.5">CPF *</label>
+            <input
+              type="text"
+              id="alunoCpf"
+              required
+              maxlength="14"
+              placeholder="000.000.000-00"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label for="alunoTelefone" class="block text-xs font-medium text-slate-300 mb-1.5">Telefone / WhatsApp *</label>
+            <input
+              type="text"
+              id="alunoTelefone"
+              required
+              maxlength="15"
+              placeholder="(11) 99999-8888"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="alunoDataNascimento" class="block text-xs font-medium text-slate-300 mb-1.5">Data de Nascimento *</label>
+            <input
+              type="date"
+              id="alunoDataNascimento"
+              required
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label for="alunoStatus" class="block text-xs font-medium text-slate-300 mb-1.5">Status *</label>
+            <select
+              id="alunoStatus"
+              required
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+            >
+              <option value="ativo">Ativo</option>
+              <option value="inativo">Inativo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
+          <button
+            type="button"
+            onclick="closeModal('modalAluno')"
+            class="px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 text-xs font-semibold transition"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-bold transition"
+          >
+            Salvar Aluno
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL 2: CRIAR / EDITAR PLANO (CRUD 2)                                 -->
+  <!-- ====================================================================== -->
+  <div id="modalPlano" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="w-full max-w-lg glass-panel rounded-3xl shadow-2xl overflow-hidden animate-fade-up">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-white/[0.08] bg-slate-950/40">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-xl bg-sky-500/15 text-sky-400">
+            <i data-lucide="credit-card" class="w-5 h-5"></i>
+          </div>
+          <h3 id="modalPlanoTitle" class="font-display text-base font-bold text-white">Cadastrar Novo Plano</h3>
+        </div>
+        <button type="button" onclick="closeModal('modalPlano')" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06]">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formPlano" class="p-6 space-y-4" novalidate>
+        <input type="hidden" id="planoId" />
+
+        <div>
+          <label for="planoNome" class="block text-xs font-medium text-slate-300 mb-1.5">Nome do Plano *</label>
+          <input
+            type="text"
+            id="planoNome"
+            required
+            placeholder="Ex: Plano Anual VIP"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="planoPreco" class="block text-xs font-medium text-slate-300 mb-1.5">Preço (R$) *</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              id="planoPreco"
+              required
+              placeholder="149.90"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label for="planoDuracao" class="block text-xs font-medium text-slate-300 mb-1.5">Duração (Meses) *</label>
+            <input
+              type="number"
+              min="1"
+              id="planoDuracao"
+              required
+              placeholder="12"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="planoDescricao" class="block text-xs font-medium text-slate-300 mb-1.5">Descrição e Benefícios (separe itens por vírgula) *</label>
+          <textarea
+            id="planoDescricao"
+            rows="3"
+            required
+            placeholder="Ex: Musculação Livre, Aulas Coletivas, Avaliação Física, Sem Taxa de Matrícula"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+          ></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
+          <button
+            type="button"
+            onclick="closeModal('modalPlano')"
+            class="px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 text-xs font-semibold transition"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-bold transition"
+          >
+            Salvar Plano
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL 3: CRIAR / EDITAR TREINO (CRUD 3)                                -->
+  <!-- ====================================================================== -->
+  <div id="modalTreino" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="w-full max-w-lg glass-panel rounded-3xl shadow-2xl overflow-hidden animate-fade-up">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-white/[0.08] bg-slate-950/40">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-xl bg-amber-500/15 text-amber-400">
+            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+          </div>
+          <h3 id="modalTreinoTitle" class="font-display text-base font-bold text-white">Cadastrar Novo Treino</h3>
+        </div>
+        <button type="button" onclick="closeModal('modalTreino')" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06]">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formTreino" class="p-6 space-y-4" novalidate>
+        <input type="hidden" id="treinoId" />
+
+        <div>
+          <label for="treinoNome" class="block text-xs font-medium text-slate-300 mb-1.5">Nome do Treino *</label>
+          <input
+            type="text"
+            id="treinoNome"
+            required
+            placeholder="Ex: Treino A — Hipertrofia Superior"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="treinoNivel" class="block text-xs font-medium text-slate-300 mb-1.5">Nível de Dificuldade *</label>
+            <select
+              id="treinoNivel"
+              required
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+            >
+              <option value="Iniciante">Iniciante</option>
+              <option value="Intermediário">Intermediário</option>
+              <option value="Avançado">Avançado</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="treinoAlunoId" class="block text-xs font-medium text-slate-300 mb-1.5">Aluno Associado (Opcional)</label>
+            <select
+              id="treinoAlunoId"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+            >
+              <option value="">Sem aluno específico</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="treinoDescricao" class="block text-xs font-medium text-slate-300 mb-1.5">Descrição dos Exercícios e Séries *</label>
+          <textarea
+            id="treinoDescricao"
+            rows="3"
+            required
+            placeholder="Ex: Supino Reto 4x10, Desenvolvimento Halteres 4x12, Tríceps Pulley 3x15"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+          ></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
+          <button
+            type="button"
+            onclick="closeModal('modalTreino')"
+            class="px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 text-xs font-semibold transition"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-bold transition"
+          >
+            Salvar Treino
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL 4: ASSOCIAR UM TREINO A UM ALUNO ESPECÍFICO                      -->
+  <!-- ====================================================================== -->
+  <div id="modalAssociarTreino" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="w-full max-w-md glass-panel rounded-3xl shadow-2xl overflow-hidden animate-fade-up">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-white/[0.08] bg-slate-950/40">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-xl bg-emerald-500/15 text-emerald-400">
+            <i data-lucide="user-plus" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-display text-base font-bold text-white">Associar Treino a Aluno</h3>
+        </div>
+        <button type="button" onclick="closeModal('modalAssociarTreino')" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06]">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formAssociarTreino" class="p-6 space-y-4" novalidate>
+        <input type="hidden" id="associarTreinoId" />
+
+        <div class="p-3.5 rounded-xl bg-slate-950/80 border border-white/[0.08]">
+          <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Treino Selecionado</span>
+          <p id="associarTreinoNomeDisplay" class="text-sm font-bold text-emerald-400 mt-1">-</p>
+        </div>
+
+        <div>
+          <label for="associarAlunoSelect" class="block text-xs font-medium text-slate-300 mb-1.5">Selecione o Aluno *</label>
+          <select
+            id="associarAlunoSelect"
+            required
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/90 border border-white/[0.1] text-sm text-white focus:outline-none focus:border-emerald-500"
+          >
+            <option value="">Selecione um aluno para associar...</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
+          <button
+            type="button"
+            onclick="closeModal('modalAssociarTreino')"
+            class="px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 text-xs font-semibold transition"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-bold transition"
+          >
+            Confirmar Associação
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts Modulares da Aplicação (Separados por Responsabilidade) -->
+  <script src="assets/js/supabaseConfig.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/alunos.js"></script>
+  <script src="assets/js/planos.js"></script>
+  <script src="assets/js/treinos.js"></script>
+  <script src="assets/js/matriculas.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+</body>
+</html>
